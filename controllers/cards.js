@@ -53,14 +53,10 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        return res
-          .status(userNotFound)
-          .send({ message: 'Карточка c указанным id не найдена' });
-      }
-      return res.send(card);
-    })
+    .orFail(() => res
+      .status(userNotFound)
+      .send({ message: 'Карточка c указанным id не найдена' }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(badRequest).send({
@@ -77,14 +73,10 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        return res
-          .status(userNotFound)
-          .send({ message: 'Карточка c указанным id не найдена' });
-      }
-      return res.send(card);
-    })
+    .orFail(() => res
+      .status(userNotFound)
+      .send({ message: 'Карточка c указанным id не найдена' }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(badRequest).send({
