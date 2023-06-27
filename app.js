@@ -2,9 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const { errors } = require('celebrate');
+const errorHandler = require('./middlewares/errorHandler');
 const router = require('./routes/index');
 
-const { PORT = 3000 } = process.env;
+const PORT = 3000;
+
 const app = express();
 
 const limiter = rateLimit({
@@ -24,15 +27,9 @@ app.use(helmet());
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '648ef2829f015f4ce7620578',
-  };
-
-  next();
-});
-
 app.use(router);
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
